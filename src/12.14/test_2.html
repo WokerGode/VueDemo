@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>12.14</title>
+</head>
+<body>
+    <div id="app">
+        <span>{{name}}</span><br>
+        <a :href="url">点我</a>
+    </div>
+</body>
+<script src="../../js/vue.js"></script>
+<script >
+var app=new Vue({
+    el:'#app',
+    data:{
+        url:'http://www.baidu.com',
+        name:"10",
+    }
+});</script>
+</html>
+

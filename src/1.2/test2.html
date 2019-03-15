@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>v-on</title>
+    <script src="../../js/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <button v-on="{mouseenter:onEnter,mouseleave:onOut}" v-on:click="onClick()">点我</button>
+        <form v-on:keyup.enter="onenter" v-on:submit.prevent="onSubmit()">
+            <input type="text"><br>
+            <button type="submit">提交</button>
+        </form>
+    </div>
+</body>
+    <script>
+        var app=new Vue({
+            el:'#app',
+            methods:{
+                onClick:function (){
+                    // console.log
+                    console.log('onClick');
+                },
+                onEnter:function(){
+                    console.log('mouse enter');
+                },
+                onOut:function (){
+                    console.log('mouse out');
+                },
+                onSubmit:function(){
+                    // e.preventDefault();
+                    console.log('sumbit');
+                },
+                onKeyup:function () {  
+                    console.log('key press');
+                },
+                onenter:function () {
+                    console.log('enter');
+                  }
+            }
+
+        });
+    </script>
+</html>

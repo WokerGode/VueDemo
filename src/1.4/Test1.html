@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>父子组建通信,子向父组件传值</title>
+    <script src="../../js/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <one></one>
+        <two></two>
+    </div>
+</body>
+<script>
+    var event = new Vue;
+    Vue.component('one',{
+        template:`<div>话说:<input type="text" @keyup="onchange()" v-model="said">{{said}}</div>`,
+        methods:{
+            onchange:function(){
+                event.$emit('said_somthing',this.said);
+                // console.log(event);
+            }
+        },
+        data:function(){
+            return {
+                said:'',
+            }
+        }
+    });
+    Vue.component('two',{
+        template:'<div>听到:<input type="text" v-model="hear">{{hear}}</div>',
+        data:function (){
+            return {
+                hear:'',
+            }
+        },
+        mounted:function(){
+            var a =this;
+            event.$on('said_somthing',function(data){
+                a.hear=data;
+            })
+        }
+    });
+    new Vue({
+        el:'#app',
+    });
+</script>
+</html>

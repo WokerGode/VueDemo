@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>创建组件</title>
+    <script src="../../js/vue.js"></script>
+    <style>
+        .flag{
+            background: #66ccff
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <like></like>
+    </div>
+</body>
+<script>
+    Vue.component('like',{
+        template:'<button :class="{flag:flag}" @click="sum()">❤ {{count}}</button>',
+        data:function(){
+            return{
+                count:10,
+                flag:false,
+            }
+        },
+        methods:{
+            sum: function () {
+                if (!this.flag) {
+                this.count++
+                }else{
+                    this.count--;
+                }
+                this.flag = !this.flag;
+            }
+        }
+    });
+    var app =new Vue({
+        el:'#app',
+    });
+</script>
+</html>

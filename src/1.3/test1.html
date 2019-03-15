@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>控制流指令</title>
+    <script src="../../js/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div v-if="role == 'admin'">
+            狗管理你好.
+        </div>
+        <div v-else-if="role == 'hr'">
+            查看简历文件: 
+            <br>...
+        </div>
+        <div v-else>
+            没有权限.
+        </div>
+    </div>
+</body>
+<script>
+    var app =new Vue({
+        el:'#app',
+        data:{
+            role:'hr',
+        }
+
+    });
+</script>
+</html>      

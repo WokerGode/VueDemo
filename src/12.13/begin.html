@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>起步</title>
+    <script src="../js/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <a v-bind:href="url">baidu</a>
+        <span>姓名:{{name}}</span>
+        <span>年龄:{{age}}</span>
+        <span>{{hh()}}</span>
+    </div>
+    <script >
+    
+        new Vue({
+            el:'#app',
+            data:{
+                name:"老铁",
+                age:18,
+                url:'http://www.baidu.com'
+            },
+            
+            methods:{
+               hh: function (){
+                   return this.name+"在吃饭"
+               }
+            }
+        })
+    </script>
+</body>
+</html>

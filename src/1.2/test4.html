@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>v-model</title>
+    <script src="../../js/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+ <!-- 单选框的v-model使用 -->
+        <!-- <label>
+            <input v-model="sex" value="male" type="radio">
+            male
+        </label>
+        <label>
+            <input type="radio" v-model="sex" value="female">
+            female<br>
+        </label>
+        {{sex}} -->
+ <!-- 多选框v-model使用 -->
+        <!-- <label>
+                <input v-model="sex" value="male" type="checkbox">
+                male
+            </label>
+            <label>
+                <input v-model="sex" value="female" type="checkbox">
+                female<br>
+            </label>
+            {{sex}} -->
+<!-- 富文本编辑器的v-model使用 -->
+        <!-- <textarea v-model="article"></textarea> -->
+<!-- select单选选择框v-model使用 -->
+        <div>你来自哪里?</div>
+        <select v-model="from">
+            <option value="1">平西府</option>
+            <option value="2">回龙观</option>
+        </select><br>
+        {{from}}
+<!-- select多选选择框v-model使用 -->
+        <div>你想去哪里?</div>
+        <select v-model="destination" multiple>
+            <option value="1">山西</option>
+            <option value="2">福建</option>
+            <option value="3">山东</option>
+            <option value="4">北京</option>
+            <option value="5">河南</option>
+        </select><br>
+        {{destination}}
+
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            sex: ['male'],
+            article: 'lorem;asdasd ',
+            from:1,
+            destination:[]
+        }
+    });
+</script>
+
+</html>

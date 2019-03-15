@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>父子组件,父组件向子组件传值</title>
+    <script src="../../js/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- <alert msg="xxx"></alert> -->
+        <user username="闫国琛"></user>
+    </div>
+</body>
+<script>
+    // Vue.component('alert',{
+    //     template:'<button @click="onclick()">弹框</button>',
+    //     props:['msg'],
+    //     methods:{
+    //         onclick:function(){
+    //             alert(this.msg)
+    //         }
+    //     }
+    // })
+    Vue.component('user',{
+        template:'<a :href="\'/user/\'+username">@{{username}}</a>',
+        props:['username'],
+    })
+    new Vue({
+        el:'#app',
+    });
+</script>
+</html>

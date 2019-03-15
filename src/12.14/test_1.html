@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>食物清单</title>
+</head>
+<body>
+    <ul id="app">
+        <li v-for="food in foodList">{{food.name}}:¥{{discount?food.price * food.discount:food.price}}</li>
+    </ul>
+</body>
+<script src="../../js/vue.js"></script>
+<script src="../../js/12.14/main.js"></script>
+</html>
