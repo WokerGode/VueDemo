@@ -473,3 +473,78 @@ public ResponseEntity<String> handle(HttpEntity<byte[]> requestEntity) throws
 
 与 **@RequestBody** 与 **@ResponseBody** 注解一样，**Spring**使用了 **HttpMessageConverter** 来对请求流
 和响应流进行转换。
+
+### 4.3.8 对方法使用@ModelAttribute注解
+
+**@ModelAttribute** 注解可被应用在方法或方法参数上。
+
+注解在方法上的 **@ModelAttribute** 说明了方法的作用是用于添加一个或多个属性到**model**上。这样的方法能接受与 **@RequestMapping** 注解相同的参数类型，只不过不能直接被映射到具体的请求上。在同一个控制器中，注解了 **@ModelAttribute** 的方法实际上会在 **@RequestMapping** 方法之前被调用。
+
+```java
+// Add one attribute
+// The return value of the method is added to the model under the name "account"
+// You can customize the name via @ModelAttribute("myAccount")
+@ModelAttribute
+public Account addAccount(@RequestParam String number) {
+	return accountManager.findAccount(number);
+}
+// Add multiple attributes
+@ModelAttribute
+public void populateModel(@RequestParam String number, Model model) {
+	model.addAttribute(accountManager.findAccount(number));
+	// add more ...
+}
+
+```
+
+**@ModelAttribute** 方法通常被用来填充一些公共需要的属性或数据，比如一个下拉列表所预设的几种状态，或者宠物的几种类型，或者去取得一个**HTML**表单渲染所需要的命令对象，比如 **Account** 等。
+
+留意 **@ModelAttribute** 方法的两种风格。在第一种写法中，方法通过返回值的方式默认地将添加一个属性；在第二种写法中，方法接收一个 **Model** 对象，然后可以向其中添加任意数量的属性。你可以在根据需要，在两种风格中选择合适的一种。
+
+一个控制器可以拥有数量不限的 **@ModelAttribute** 方法。同个控制器内的所有这些方法，都会在 **@RequestMapping** 方法之前被调用。
+
+### 4.3.9在请求之间使用@SessionAttributes注解，使用HTTP会话保存模型数据
+
+类型级别的 **@SessionAttributes** 注解声明了某个特定处理器所使用的会话属性。通常它会列出该类型希望存储到**session**或**converstaion**中的**model**属性名或**model**的类型名，一般是用于在请求之间保存一些表单数据的**bean**。
+
+以下的代码段演示了该注解的用法，它指定了模型属性的名称
+
+```java
+@Controller
+@RequestMapping("/editPet.do")
+@SessionAttributes("pet")
+public class EditPetForm {
+	// ...
+}
+```
+
+## 5.异步请求的处理
+
+**Spring MVC 3.2**开始引入了基于**Servlet 3**的异步请求处理。相比以前，控制器方法已经不一定需要返回一个值，而是可以返回一个 **java.util.concurrent.Callable** 的对象，并通过**SpringMVC**所管理的线程来产生返回值。与此同时，**Servlet**容器的主线程则可以退出并释放其资源了，同时也允许容器去处理其他的请求。通过一个 **TaskExecutor** ，**Spring MVC**可以在另外的线程中调用 **Callable** 。当 **Callable** 返回时，请求再携带 **Callable** 返回的值，再次被分配到**Servlet**容器中恢复处理流程。以下代码给出了一个这样的控制器方法作为例子：
+
+```java
+@RequestMapping(method=RequestMethod.POST)
+public Callable<String> processUpload(final MultipartFile file) {
+	return new Callable<String>() {
+        public String call() throws Exception {	
+            // ...
+            return "someView";
+        }
+	};
+}
+```
+
+另一个选择，是让控制器方法返回一个 **DeferredResult** 的实例。这种场景下，返回值可以由任何一个线程产生，也包括那些不是由**Spring MVC**管理的线程。举个例子，返回值可能是为了响应某些外部事件所产生的，比如一条**JMS**的消息，一个计划任务，等等。以下代码给出了一个这样的控制器作为例子：
+
+```java
+@RequestMapping("/quotes")
+@ResponseBody
+public DeferredResult<String> quotes() {
+DeferredResult<String> deferredResult = new DeferredResult<String>();
+    // Save the deferredResult somewhere..
+    return deferredResult;
+}
+// In some other thread...
+deferredResult.setResult(data);
+```
+
