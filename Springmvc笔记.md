@@ -548,3 +548,90 @@ DeferredResult<String> deferredResult = new DeferredResult<String>();
 deferredResult.setResult(data);
 ```
 
+## 6.处理器映射器
+
+在**Spring**的上个版本中，用户需要在**web**应用的上下文中定义一个或多个的 **HandlerMapping bean**，用以将进入容器的**web**请求映射到合适的处理器方法上。允许在控制器上添加注解后，通常你就不必这么做了，因为 **RequestMappingHandlerMapping** 类会自动查找所有注解了 **@RequestMapping** 的 **@Controller** 控制器**bean**。同时也请知道，所有继承自 **AbstractHandlerMapping** 的处理器方法映射 **HandlerMapping** 类都拥有下列的属性，你可以对它们进行定制：
+
+- 一个 **interceptors** 列表，指示了应用其上的一个拦截器列表。
+
+- **defaultHandler** ，生效的默认处理器，**when this handler mapping does not result in amatching handler.**
+
+- **order** ，根据**order**（见 **org.springframework.core.Ordered** 接口）属性的值，**Spring**会对上下文可用的所有处理器映射进行排序，并应用第一个匹配成功的处理器
+
+- **alwaysUseFullPath** （总是使用完整路径）。若设置为 **true** ，**Spring**将在当前**Servlet**上下文中总是使用完整路径来查找合适的处理器。若设置为 **false** （默认就为 **false** ），则使用当前**Servlet**的**mapping**路径。举个例子，若一个**Servlet**的**mapping**路径是 **/testing/*** ，并且 **alwaysUseFullPath** 属性被设置为 **true** ，此时用于查找处理器的路径将是 **/testing/viewPage.html** ；而若 **alwaysUseFullPath** 属性的值为 false ，则此时查找路径是 **/viewPage.html**
+
+  下面的代码展示了配置一个拦截器的方法：
+
+  ```xml
+  <beans>
+      <bean id="handlerMapping" class="org.springframework.web.servlet.mvc.method.annota
+      tion.RequestMappingHandlerMapping">
+          <property name="interceptors">
+          	<bean class="example.MyInterceptor"/>
+          </property>
+  	</bean>
+  <beans>
+  ```
+
+  ### 6.1使用HandlerInterceptor拦截请求
+
+  **Spring**的处理器映射机制包含了处理器拦截器。拦截器在你需要为特定类型的请求应用一些功能时可能很有用，比如，检查用户身份等。
+
+  处理器映射处理过程配置的拦截器，必须实现 **org.springframework.web.servlet** 包下的**HandlerInterceptor** 接口。这个接口定义了三个方法： **preHandle**(..) ，它在处理器实际执行 之前 会被执行； **postHandle**(..) ，它在处理器执行 完毕 以后被执行；**afterCompletion**(..) ，它在 整个请求处理完成 之后被执行。这三个方法为各种类型的前处理和后处理需求提供了足够的灵活性。
+
+  **preHandle**(..) 方法返回一个**boolean**值。你可以通过这个方法来决定是否继续执行处理链中的部件。当方法返回 **true** 时，处理器链会继续执行；若方法返回 **false** ，**DispatcherServlet** 即认为拦截器自身已经完成了对请求的处理（比如说，已经渲染了一个合适的视图），那么其余的拦截器以及执行链中的其他处理器就不会再被执行了。
+
+  拦截器可以通过 **interceptors** 属性来配置，该选项在所有继承了 **AbstractHandlerMapping** 的处理器映射类 **HandlerMapping** 都提供了配置的接口。如下面代码样例所示：
+
+  ```xml
+  <beans>
+      <bean id="handlerMapping" class="org.springframework.web.servlet.mvc.method.annota
+      tion.RequestMappingHandlerMapping">
+          <property name="interceptors">
+          <list>
+          <ref bean="officeHoursInterceptor"/>
+          </list>
+          </property>
+      </bean>
+      <bean id="officeHoursInterceptor" class="samples.TimeBasedAccessInterceptor">
+          <property name="openingTime" value="9"/>
+          <property name="closingTime" value="18"/>
+      </bean>
+  <beans>
+  ```
+
+  
+
+```java
+package samples;
+public class TimeBasedAccessInterceptor extends HandlerInterceptorAdapter {
+    private int openingTime;
+    private int closingTime;
+    
+    public void setOpeningTime(int openingTime) {
+        this.openingTime = openingTime;
+    }
+    
+    public void setClosingTime(int closingTime) {
+        this.closingTime = closingTime;
+    }
+    
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+        Object handler) throws Exception {
+        Calendar cal = Calendar.getInstance();
+        int hour = cal.get(HOUR_OF_DAY);
+        if (openingTime <= hour && hour < closingTime) {
+        	return true;
+    	}
+    	response.sendRedirect("http://host.com/outsideOfficeHours.html");
+    	return false;
+    }
+}
+```
+
+在上面的例子中，所有被此处理器处理的请求都会被 **TimeBasedAccessInterceptor** 拦截器拦截。如果当前时间在工作时间以外，那么用户就会被重定向到一个**HTML**文件提示用户，比如显示“你只有在工作时间才可以访问本网站”之类的信息。
+
+**Spring的拦截器适配器 HandlerInterceptorAdapter 让继承 HandlerInterceptor 接口变得更简单了。**
+
+需要注意的是， **HandlerInterceptor** 的后拦截 **postHandle** 方法不一定总是适用于注解了 **@ResponseBody** 或 **ResponseEntity** 的方法。这些场景中， **HttpMessageConverter** 会在拦截器的 **postHandle** 方法被调之前就把信息写回响应中。这样拦截器就无法再改变响应了，比如要增加一个响应头之类的。如果有这种需求，请让你的应用实现 **ResponseBodyAdvice** 接口，并将其定义为一个 **@ControllerAdvice bean**或直接在 **RequestMappingHandlerMapping** 中配置。
+
